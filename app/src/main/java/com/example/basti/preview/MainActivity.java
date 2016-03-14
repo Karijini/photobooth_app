@@ -18,14 +18,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 import org.json.JSONObject;
 import org.json.JSONException;
-
 import java.util.ArrayList;
+
 
 public class MainActivity extends AppCompatActivity {
     private Integer m_current_image_index;
     private ArrayList<String> m_image_names;
-    Integer EVENT_TYPE_NEW_IMAGE =0;
-    Integer EVENT_TYPE_COUNT_DOWN =1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         m_current_image_index = -1;
@@ -70,14 +68,14 @@ public class MainActivity extends AppCompatActivity {
                     switch (event_name) {
                         case "new_image": {
                             System.out.println(event.getString("image_name"));
-                            threadMsg(EVENT_TYPE_NEW_IMAGE,
+                            threadMsg(Constants.EVENT_TYPE_NEW_IMAGE,
                                     event.getString("image_name"));
                         }
                         case "count_down_changed":{
                             System.out.println(event.getInt("count_down"));
                             Integer count_down = event.getInt("count_down");
                             String data = Integer.toString(count_down);
-                            threadMsg(EVENT_TYPE_COUNT_DOWN,
+                            threadMsg(Constants.EVENT_TYPE_COUNT_DOWN,
                                       data);
                         }
                     }
@@ -95,14 +93,17 @@ public class MainActivity extends AppCompatActivity {
             }
             private final Handler handler = new Handler() {
                 public void handleMessage(Message msg) {
-                    Integer eventType = msg.getData().getInt("eventType");
-                    if (eventType==EVENT_TYPE_NEW_IMAGE)
-                    {
-                        m_a.new_image(msg.getData().getString("data"));
-                        m_a.set_info_text(msg.getData().getString("data"));
-                    }
-                    else if(eventType==EVENT_TYPE_COUNT_DOWN) {
-                        m_a.set_info_text(msg.getData().getString("data"));
+                    int eventType = msg.getData().getInt("eventType");
+                    switch (eventType) {
+                        case Constants.EVENT_TYPE_NEW_IMAGE:{
+                            m_a.new_image(msg.getData().getString("data"));
+                            m_a.set_info_text(msg.getData().getString("data"));
+                            break;
+                        }
+                        case Constants.EVENT_TYPE_COUNT_DOWN:{
+                            m_a.set_info_text(msg.getData().getString("data"));
+                            break;
+                        }
                     }
                 }
             };
