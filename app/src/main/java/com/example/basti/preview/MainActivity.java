@@ -19,7 +19,7 @@ import android.widget.Toast;
 import org.json.JSONObject;
 import org.json.JSONException;
 import java.util.ArrayList;
-
+import android.view.WindowManager;
 
 public class MainActivity extends AppCompatActivity {
     private Integer m_current_image_index;
@@ -29,6 +29,8 @@ public class MainActivity extends AppCompatActivity {
         m_current_image_index = -1;
         m_image_names = new ArrayList<String>();
         super.onCreate(savedInstanceState);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
         ImageView imageView = (ImageView) findViewById(R.id.imageView);
         imageView.setOnTouchListener(new OnSwipeTouchListener(this) {
@@ -59,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
 
         });
 
-        Thread thread = new Thread(new ZmqEventWantcher(this,"tcp://192.168.0.25:5557")
+        Thread thread = new Thread(new ZmqEventWantcher(this,"tcp://192.168.0.1:5557")
         {
             @Override
             public void process_event(JSONObject event) {
@@ -111,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
         );
         thread.start();
 
-        new ZmqTaskLoadImages(this,"tcp://192.168.0.25:5556").execute("");
+        new ZmqTaskLoadImages(this,"tcp://192.168.0.1:5556").execute("");
     }
     public void sendToScreen()
     {
@@ -122,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(getApplicationContext(),
                 "send to screen: "+m_image_names.get(m_current_image_index),
                 Toast.LENGTH_SHORT).show();
-        new ZmqTaskSendToScreen(this,"tcp://192.168.0.25:5556").execute(m_image_names.get(m_current_image_index));
+        new ZmqTaskSendToScreen(this,"tcp://192.168.0.1:5556").execute(m_image_names.get(m_current_image_index));
     }
     public void loadBitmap()
     {
@@ -133,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         PreviewPic pic = new PreviewPic(m_image_names.get(m_current_image_index));
-        new ZmqTaskLoadPreview(this,"tcp://192.168.0.25:5556").execute(pic);
+        new ZmqTaskLoadPreview(this,"tcp://192.168.0.1:5556").execute(pic);
     }
 
     public void takePictureOnClick(View v)
@@ -141,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
         Button b = (Button)v;
         //b.setText("clicked");
         System.out.println("takePictureOnClick");
-        new ZmqTaskTakePic(this,"tcp://192.168.0.25:5556").execute("take_pic");
+        new ZmqTaskTakePic(this,"tcp://192.168.0.1:5556").execute("take_pic");
     }
 
     public void previewBitmapLoaded(PreviewPic preview_pic)
@@ -165,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
         Button b = (Button)v;
         //b.setText("clicked");
         System.out.println("printPictureOnClick");
-        new ZmqTaskPrintPic(this,"tcp://192.168.0.25:5556").execute(m_image_names.get(m_current_image_index));
+        new ZmqTaskPrintPic(this,"tcp://192.168.0.1:5556").execute(m_image_names.get(m_current_image_index));
     }
 
     public void pictureTimerStarted(Integer sec)
